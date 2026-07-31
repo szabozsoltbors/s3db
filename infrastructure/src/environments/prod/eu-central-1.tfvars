@@ -1,0 +1,5 @@
+profile        = "aws_profile"
+region         = "eu-central-1"
+s3_bucket_name = "szs-prod-s3db-store"
+lambda_name    = "szs-prod-s3db-lambda"
+stage_name     = "prod"

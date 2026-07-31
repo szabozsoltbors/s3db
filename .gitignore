@@ -1,0 +1,25 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### VS Code ###
+.vscode/
+
+### DS_store ###
+*.DS_Store
+
+### Terraform ###
+.terraform*
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+tfplan*
+
+### Go ###
+worker/build/
+response.json
