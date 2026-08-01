@@ -90,7 +90,7 @@ resource "aws_lambda_function" "java_lambda" {
 
   environment {
     variables = {
-      DISABLE_SIGNAL_HANDLERS = "true"
+      S3_BUCKET_NAME = var.s3_bucket_name
     }
   }
 

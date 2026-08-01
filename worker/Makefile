@@ -21,7 +21,7 @@ endif
 .PHONY: run
 run:
 	@echo "\n${YELLOW}Run the project${WHITE}" && \
-	LOCAL=1 go run .
+	LOCAL=1 S3_BUCKET_NAME=$(S3_BUCKET_NAME) go run .
 
 .PHONY: clean
 clean:
