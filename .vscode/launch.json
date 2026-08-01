@@ -9,6 +9,8 @@
             "program": "${workspaceFolder}/worker",
             "env": {
                 "LOCAL": "1",
+                "INPUT": "data/input.json",
+                "S3_BUCKET_NAME": "szs-dev-s3db-store",
                 "AWS_PROFILE": "aws_profile",
                 "AWS_REGION": "eu-central-1"
             }

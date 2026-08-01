@@ -57,7 +57,9 @@ invoke:
 		--payload file://$(INPUT_FILE) \
 		--log-type Tail \
 		response.json && \
-		echo "\n${GREEN}Lambda function invoked: ${WHITE}\n $(shell cat response.json)\n"
+		echo "\n${GREEN}Lambda function invoked:${WHITE}" && \
+		cat response.json && \
+		echo
 
 .PHONY: test
 test:

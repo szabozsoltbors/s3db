@@ -73,7 +73,7 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
 }
 
 # Create the Lambda function
-resource "aws_lambda_function" "java_lambda" {
+resource "aws_lambda_function" "lambda" {
   function_name = var.lambda_name
   role          = aws_iam_role.lambda_exec.arn
 
@@ -99,6 +99,6 @@ resource "aws_lambda_function" "java_lambda" {
 
 resource "aws_lambda_alias" "lambda_alias" {
   name             = var.lambda_alias
-  function_name    = aws_lambda_function.java_lambda.function_name
-  function_version = aws_lambda_function.java_lambda.version
+  function_name    = aws_lambda_function.lambda.function_name
+  function_version = aws_lambda_function.lambda.version
 }

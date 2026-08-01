@@ -2,15 +2,27 @@ package lambda
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
+	uuid "github.com/google/uuid"
 	port "github.com/szabozsoltbors/s3db/internal/port/in"
+)
+
+const (
+	CommandInsertOne = "insertOne"
+	CommandDeleteOne = "deleteOne"
+	CommandFind      = "find"
 )
 
 type Handler struct {
 	create port.CreateObject
 	delete port.DeleteObject
 	list   port.ListObjects
+}
+
+type Filter struct {
+	ID string `json:"_id"`
 }
 
 func NewHandler(create port.CreateObject, delete port.DeleteObject, list port.ListObjects) *Handler {
@@ -22,29 +34,60 @@ func NewHandler(create port.CreateObject, delete port.DeleteObject, list port.Li
 }
 
 func (h *Handler) Handle(ctx context.Context, event Event) (string, error) {
-	createErr := h.create.Upload(ctx, event.Key, event.Data)
+
+	if event.Command == CommandInsertOne {
+		return h.handleInsertOne(ctx, event)
+	}
+
+	if event.Command == CommandDeleteOne {
+		var filter Filter
+		json.Unmarshal(event.Filter, &filter)
+
+		return h.handleDelete(ctx, event, filter.ID)
+	}
+
+	if event.Command == CommandFind {
+		return h.handleList(ctx, event)
+	}
+
+	return "Unsupported command provided: " + event.Command + "\n", nil
+}
+
+func (h *Handler) handleInsertOne(ctx context.Context, event Event) (string, error) {
+	uuid := uuid.New()
+	key := event.Collection + "/" + uuid.String()
+
+	createErr := h.create.Upload(ctx, key, event.Data)
 	if createErr != nil {
 		return "", createErr
 	}
 
-	listResultBeforeDelete, listErr := h.list.List(ctx, "")
-	if listErr != nil {
-		return "", listErr
+	return "Command: " + event.Command + "\n" +
+		"document inserted with name: " + key + "\n", nil
+}
+
+func (h *Handler) handleDelete(ctx context.Context, event Event, id string) (string, error) {
+	if id == "" {
+		return "", fmt.Errorf("missing id in filter for deleteOne command")
 	}
 
-	deleteErr := h.delete.Delete(ctx, event.Key)
+	key := event.Collection + "/" + id
+
+	deleteErr := h.delete.Delete(ctx, key)
 	if deleteErr != nil {
 		return "", deleteErr
 	}
 
-	listResultAfterDelete, listErr := h.list.List(ctx, "")
+	return "Command: " + event.Command + "\n" +
+		"document deleted with name: " + key + "\n", nil
+}
+
+func (h *Handler) handleList(ctx context.Context, event Event) (string, error) {
+	listResult, listErr := h.list.List(ctx, event.Collection)
 	if listErr != nil {
 		return "", listErr
 	}
 
-	return "Hello, s3db! \n" +
-		"File created with name: " + event.Key + "\n" +
-		"List result before delete: " + fmt.Sprint(listResultBeforeDelete) + "\n" +
-		"Delete result: " + event.Key + "\n" +
-		"List result after delete: " + fmt.Sprint(listResultAfterDelete) + "\n", nil
+	return "Command: " + event.Command + "\n" +
+		"List result: " + fmt.Sprint(listResult) + "\n", nil
 }

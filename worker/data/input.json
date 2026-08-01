@@ -1,4 +1,8 @@
 {
-    "key": "hello.txt",
-    "content": "Hello, s3db!"
+    "collection": "test",
+    "command": "find",
+    "filter": {
+        "_id": "ac75f692-fb04-47bf-900a-2c3499895342"
+    },
+    "data": "Hello, s3db!"
 }
