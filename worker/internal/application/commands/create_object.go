@@ -16,11 +16,6 @@ func NewCreateCommand(port port.Save) *CreateCommand {
 	}
 }
 
-func (s *CreateCommand) Execute(ctx context.Context) (string, error) {
-	result, err := s.port.Execute(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+func (s *CreateCommand) Upload(ctx context.Context, key string, data []byte) error {
+	return s.port.Upload(ctx, key, data)
 }

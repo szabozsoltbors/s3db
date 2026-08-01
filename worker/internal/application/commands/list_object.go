@@ -16,10 +16,10 @@ func NewListCommand(port port.List) *ListCommand {
 	}
 }
 
-func (s *ListCommand) Execute(ctx context.Context) (string, error) {
-	result, err := s.port.Execute(ctx)
+func (s *ListCommand) List(ctx context.Context, prefix string) ([]string, error) {
+	result, err := s.port.List(ctx, prefix)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return result, nil

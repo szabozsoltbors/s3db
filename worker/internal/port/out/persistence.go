@@ -3,13 +3,13 @@ package out
 import "context"
 
 type Save interface {
-	Execute(ctx context.Context) (string, error)
+	Upload(ctx context.Context, key string, data []byte) error
 }
 
 type Delete interface {
-	Execute(ctx context.Context) (string, error)
+	Delete(ctx context.Context, key string) error
 }
 
 type List interface {
-	Execute(ctx context.Context) (string, error)
+	List(ctx context.Context, prefix string) ([]string, error)
 }

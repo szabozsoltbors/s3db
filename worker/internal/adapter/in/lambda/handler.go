@@ -2,14 +2,15 @@ package lambda
 
 import (
 	"context"
+	"fmt"
 
 	port "github.com/szabozsoltbors/s3db/internal/port/in"
 )
 
 type Handler struct {
-    create port.CreateObject
-    delete port.DeleteObject
-    list   port.ListObjects
+	create port.CreateObject
+	delete port.DeleteObject
+	list   port.ListObjects
 }
 
 func NewHandler(create port.CreateObject, delete port.DeleteObject, list port.ListObjects) *Handler {
@@ -21,23 +22,29 @@ func NewHandler(create port.CreateObject, delete port.DeleteObject, list port.Li
 }
 
 func (h *Handler) Handle(ctx context.Context) (string, error) {
-	createResult, createErr := h.create.Execute(ctx)
+	createErr := h.create.Upload(ctx, "key", []byte("data"))
 	if createErr != nil {
 		return "", createErr
 	}
 
-	deleteResult, deleteErr := h.delete.Execute(ctx)
+	listResultBeforeDelete, listErr := h.list.List(ctx, "")
+	if listErr != nil {
+		return "", listErr
+	}
+
+	deleteErr := h.delete.Delete(ctx, "key")
 	if deleteErr != nil {
 		return "", deleteErr
 	}
 
-	listResult, listErr := h.list.Execute(ctx)
+	listResultAfterDelete, listErr := h.list.List(ctx, "")
 	if listErr != nil {
 		return "", listErr
 	}
 
 	return "Hello, s3db! \n" +
-		"Create result: " + createResult + "\n" +
-		"Delete result: " + deleteResult + "\n" +
-		"List result: " + listResult + "\n", nil
+		"File created with name: " + "key" + "\n" +
+		"List result before delete: " + fmt.Sprint(listResultBeforeDelete) + "\n" +
+		"Delete result: " + "key" + "\n" +
+		"List result after delete: " + fmt.Sprint(listResultAfterDelete) + "\n", nil
 }

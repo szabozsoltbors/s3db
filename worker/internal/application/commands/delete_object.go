@@ -16,11 +16,6 @@ func NewDeleteCommand(port port.Delete) *DeleteCommand {
 	}
 }
 
-func (s *DeleteCommand) Execute(ctx context.Context) (string, error) {
-	result, err := s.port.Execute(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+func (s *DeleteCommand) Delete(ctx context.Context, key string) error {
+	return s.port.Delete(ctx, key)
 }

@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Local",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/worker",
+            "env": {
+                "LOCAL": "1",
+                "AWS_PROFILE": "aws_profile",
+                "AWS_REGION": "eu-central-1"
+            }
+        }
+    ]
+}
