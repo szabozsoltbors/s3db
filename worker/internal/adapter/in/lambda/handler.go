@@ -21,8 +21,8 @@ func NewHandler(create port.CreateObject, delete port.DeleteObject, list port.Li
 	}
 }
 
-func (h *Handler) Handle(ctx context.Context) (string, error) {
-	createErr := h.create.Upload(ctx, "key", []byte("data"))
+func (h *Handler) Handle(ctx context.Context, event Event) (string, error) {
+	createErr := h.create.Upload(ctx, event.Key, event.Data)
 	if createErr != nil {
 		return "", createErr
 	}
@@ -32,7 +32,7 @@ func (h *Handler) Handle(ctx context.Context) (string, error) {
 		return "", listErr
 	}
 
-	deleteErr := h.delete.Delete(ctx, "key")
+	deleteErr := h.delete.Delete(ctx, event.Key)
 	if deleteErr != nil {
 		return "", deleteErr
 	}
@@ -43,8 +43,8 @@ func (h *Handler) Handle(ctx context.Context) (string, error) {
 	}
 
 	return "Hello, s3db! \n" +
-		"File created with name: " + "key" + "\n" +
+		"File created with name: " + event.Key + "\n" +
 		"List result before delete: " + fmt.Sprint(listResultBeforeDelete) + "\n" +
-		"Delete result: " + "key" + "\n" +
+		"Delete result: " + event.Key + "\n" +
 		"List result after delete: " + fmt.Sprint(listResultAfterDelete) + "\n", nil
 }

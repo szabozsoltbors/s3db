@@ -10,6 +10,7 @@ YELLOW=\033[1;33m
 PROFILE ?= dev
 BUILD_DIR := build
 ENV_FILE := env/$(PROFILE).env
+INPUT_FILE := data/input.json
 
 ifneq (,$(wildcard $(ENV_FILE)))
 include $(ENV_FILE)
@@ -21,7 +22,7 @@ endif
 .PHONY: run
 run:
 	@echo "\n${YELLOW}Run the project${WHITE}" && \
-	LOCAL=1 S3_BUCKET_NAME=$(S3_BUCKET_NAME) go run .
+	LOCAL=1 INPUT=$(INPUT_FILE) S3_BUCKET_NAME=$(S3_BUCKET_NAME) go run .
 
 .PHONY: clean
 clean:
@@ -52,7 +53,8 @@ invoke:
 	@echo "\n${YELLOW}Invoke AWS Lambda function${WHITE}" && \
 	aws lambda invoke \
 		--function-name $(LAMBDA_NAME) \
-		--payload '{}' \
+		--cli-binary-format raw-in-base64-out \
+		--payload file://$(INPUT_FILE) \
 		--log-type Tail \
 		response.json && \
 		echo "\n${GREEN}Lambda function invoked: ${WHITE}\n $(shell cat response.json)\n"

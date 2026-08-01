@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -12,11 +13,12 @@ import (
 	handler "github.com/szabozsoltbors/s3db/internal/adapter/in/lambda"
 	repository "github.com/szabozsoltbors/s3db/internal/adapter/out/repository/aws/s3"
 	commands "github.com/szabozsoltbors/s3db/internal/application/commands"
+	pkg "github.com/szabozsoltbors/s3db/pkg"
 )
 
 func main() {
 	// Load environment variables from .env file
-	var bucket string = os.Getenv("S3_BUCKET_NAME")
+	bucket := os.Getenv("S3_BUCKET_NAME")
 
 	// Load AWS configuration (region, credentials, etc.)
 	ctx := context.Background()
@@ -36,7 +38,14 @@ func main() {
 
 	// If running locally, invoke the handler directly for testing
 	if os.Getenv("LOCAL") == "1" {
-		result, err := h.Handle(context.Background())
+		input := os.Getenv("INPUT")
+
+		data, err := pkg.ReadFile(input)
+		if err != nil {
+			log.Fatalf("unable to read input file: %v", err)
+		}
+
+		result, err := h.Handle(context.Background(), mapDataToEvent(data))
 		fmt.Println("result:", result)
 		fmt.Println("error:", err)
 		return
@@ -44,4 +53,12 @@ func main() {
 
 	// Start the AWS Lambda function
 	lambda.Start(h.Handle)
+}
+
+func mapDataToEvent(data []byte) handler.Event {
+	var event handler.Event
+	if err := json.Unmarshal(data, &event); err != nil {
+		log.Fatal(err)
+	}
+	return event
 }
