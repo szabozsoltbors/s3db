@@ -1,5 +1,5 @@
 >[!Note]
-> This project is in early phase of development. Please handle with care.
+> This project is in early phase of development. Please handle it with care.
 
 # s3db
 
